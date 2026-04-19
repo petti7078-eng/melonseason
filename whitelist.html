@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Whitelist - Melon Season</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;700&family=DM+Mono:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --ink:#060606;--ink2:#0e0e0e;--ink3:#161616;
+  --white:#F8F6F2;--acid:#C8FF3A;--rust:#D4400A;
+  --muted:rgba(248,246,242,0.38);--muted2:rgba(248,246,242,0.55);
+  --line:rgba(255,255,255,0.06);
+  --ff-disp:'Bebas Neue',sans-serif;
+  --ff-body:'Space Grotesk',sans-serif;
+  --ff-mono:'DM Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);color:var(--white);
+  font-family:var(--ff-body);font-size:16px;line-height:1.6;
+  overflow-x:hidden;cursor:none;min-height:100vh;
+}
+a{color:inherit;text-decoration:none}
+
+#cursor{
+  position:fixed;width:6px;height:6px;background:var(--acid);border-radius:50%;
+  pointer-events:none;z-index:99999;transform:translate(-50%,-50%);
+  mix-blend-mode:difference;transition:width .2s,height .2s;
+}
+#cursor-ring{
+  position:fixed;width:36px;height:36px;
+  border:1px solid rgba(200,255,58,0.4);border-radius:50%;
+  pointer-events:none;z-index:99998;transform:translate(-50%,-50%);
+  transition:width .5s,height .5s,opacity .3s;
+}
+body.cursor-hover #cursor{width:12px;height:12px}
+body.cursor-hover #cursor-ring{width:52px;height:52px;opacity:.3}
+
+#grain{
+  position:fixed;inset:0;pointer-events:none;z-index:9000;opacity:.04;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+  animation:g .3s steps(1) infinite;
+}
+@keyframes g{0%{transform:translate(0,0)}25%{transform:translate(-1%,-2%)}50%{transform:translate(2%,1%)}75%{transform:translate(-2%,2%)}}
+
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:5000;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:28px 60px;mix-blend-mode:difference;
+}
+.nav-wordmark{font-family:var(--ff-disp);font-size:20px;letter-spacing:2px}
+.nav-wordmark span{color:var(--acid)}
+.nav-items{display:flex;gap:40px;align-items:center}
+.nav-items a{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;opacity:.5;transition:opacity .2s}
+.nav-items a:hover{opacity:1}
+.nav-active{opacity:1!important;color:var(--acid)!important}
+
+.wl-page{
+  position:relative;z-index:10;min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  padding:140px 60px 80px;
+}
+.wl-container{width:100%;max-width:520px}
+
+.wl-badge{
+  display:flex;align-items:center;gap:12px;margin-bottom:28px;
+}
+.wl-badge::before{content:'';display:block;width:32px;height:1px;background:var(--acid)}
+.wl-badge span{
+  font-family:var(--ff-mono);font-size:11px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--acid);
+}
+
+.wl-title{
+  font-family:var(--ff-disp);
+  font-size:clamp(56px,8vw,100px);
+  line-height:.84;letter-spacing:1px;margin-bottom:20px;
+}
+.wl-title em{font-style:normal;color:var(--acid)}
+
+.wl-sub{font-size:15px;color:var(--muted2);line-height:1.8;margin-bottom:48px;max-width:380px}
+.wl-sub strong{color:var(--white);font-weight:500}
+
+.wl-progress{margin-bottom:40px}
+.wl-bar{height:3px;background:var(--line);margin-bottom:8px}
+.wl-bar-fill{height:100%;background:var(--acid);transition:width 1s}
+.wl-bar-txt{font-family:var(--ff-mono);font-size:10px;letter-spacing:.12em;color:var(--muted)}
+.wl-bar-txt strong{color:var(--acid)}
+
+.wl-card{border:1px solid var(--line);padding:40px;background:rgba(255,255,255,.015)}
+.wl-label{
+  font-family:var(--ff-mono);font-size:10px;font-weight:500;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;display:block;
+}
+.wl-input{
+  width:100%;padding:14px 16px;
+  background:rgba(255,255,255,.04);border:1px solid var(--line);
+  color:var(--white);font-family:var(--ff-body);font-size:14px;
+  outline:none;transition:border-color .3s;margin-bottom:20px;
+}
+.wl-input:focus{border-color:rgba(200,255,58,.4)}
+.wl-input::placeholder{color:rgba(255,255,255,.2)}
+.wl-btn{
+  width:100%;background:var(--acid);color:var(--ink);
+  padding:16px;border:none;
+  font-family:var(--ff-disp);font-size:16px;letter-spacing:1px;
+  cursor:pointer;transition:transform .3s,box-shadow .3s;
+}
+.wl-btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(200,255,58,.25)}
+.wl-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.wl-msg{margin-top:12px;font-size:13px;text-align:center;min-height:18px}
+.wl-msg.success{color:var(--acid)}
+.wl-msg.error{color:var(--rust)}
+
+.wl-ok{text-align:center;padding:20px 0}
+.wl-ok-check{
+  width:48px;height:48px;border:2px solid var(--acid);
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:20px;color:var(--acid);margin-bottom:16px;
+}
+.wl-ok h3{font-family:var(--ff-disp);font-size:28px;letter-spacing:1px;margin-bottom:6px}
+.wl-ok p{font-size:13px;color:var(--muted);margin-bottom:24px}
+.tweet-btn{
+  display:inline-block;background:var(--acid);color:var(--ink);
+  padding:12px 28px;font-family:var(--ff-disp);font-size:14px;
+  letter-spacing:1px;transition:transform .3s,box-shadow .3s;
+}
+.tweet-btn:hover{transform:scale(1.05);box-shadow:0 12px 40px rgba(200,255,58,.25)}
+
+.wl-stats{
+  display:flex;gap:0;margin-top:48px;border-top:1px solid var(--line);
+}
+.ws{flex:1;padding:20px 0;border-right:1px solid var(--line)}
+.ws:last-child{border-right:none}
+.ws-val{font-family:var(--ff-disp);font-size:28px;letter-spacing:1px;display:block;line-height:1}
+.ws-lbl{font-family:var(--ff-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:5px;display:block}
+
+@media(max-width:768px){
+  nav{padding:20px 24px}
+  .nav-items{display:none}
+  .wl-page{padding:100px 24px 60px}
+  .wl-card{padding:28px 20px}
+}
+</style>
+</head>
+<body>
+
+<div id="grain"></div>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<nav>
+  <a href="/" class="nav-wordmark">MELON<span>.</span></a>
+  <ul class="nav-items">
+    <li><a href="/#system">System</a></li>
+    <li><a href="/#product">Platform</a></li>
+    <li><a href="/whitelist" class="nav-active">Whitelist</a></li>
+  </ul>
+</nav>
+
+<div class="wl-page">
+  <div class="wl-container">
+
+    <div class="wl-badge"><span>Season 01 - Limited Entry</span></div>
+    <h1 class="wl-title">SECURE<br>YOUR <em>SEED.</em></h1>
+    <p class="wl-sub"><strong>Enter your X handle and wallet.</strong><br>Tweet to confirm. That's it. You're in the Season.</p>
+
+    <div class="wl-progress">
+      <div class="wl-bar"><div class="wl-bar-fill" style="width:{{ (wl_count/150*100)|round(1) }}%"></div></div>
+      <div class="wl-bar-txt"><strong>{{ wl_count }}</strong> / 150 claimed</div>
+    </div>
+
+    <div class="wl-card" id="wl-card">
+      {% if registered %}
+      <div class="wl-ok">
+        <div class="wl-ok-check">✓</div>
+        <h3>YOU'RE IN</h3>
+        <p>@{{ x_handle }} - whitelist confirmed</p>
+        <a href="https://x.com/intent/tweet?text=Just%20secured%20my%20spot%20on%20%40melonseasoned%20whitelist%20%F0%9F%8D%89%0A%0AFree%20mint.%20999%20supply." target="_blank" class="tweet-btn">TWEET TO CONFIRM →</a>
+      </div>
+      {% else %}
+      <form id="reg-form">
+        <label class="wl-label">X Handle</label>
+        <input type="text" class="wl-input" id="r-handle" placeholder="@yourhandle" required minlength="2" maxlength="30">
+        <label class="wl-label">Wallet Address</label>
+        <input type="text" class="wl-input" id="r-wallet" placeholder="0x..." required maxlength="42">
+        <button type="submit" class="wl-btn" id="reg-btn">REGISTER FOR WHITELIST</button>
+        <div class="wl-msg" id="reg-msg"></div>
+      </form>
+      {% endif %}
+    </div>
+
+    <div class="wl-stats">
+      <div class="ws"><span class="ws-val">999</span><span class="ws-lbl">Supply</span></div>
+      <div class="ws"><span class="ws-val">Free</span><span class="ws-lbl">Mint Price</span></div>
+      <div class="ws"><span class="ws-val">ETH</span><span class="ws-lbl">Chain</span></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const cursor=document.getElementById('cursor'),cring=document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px'});
+(function ac(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;cring.style.left=rx+'px';cring.style.top=ry+'px';requestAnimationFrame(ac)})();
+document.querySelectorAll('a,button,.wl-input').forEach(el=>{
+  el.addEventListener('mouseenter',()=>document.body.classList.add('cursor-hover'));
+  el.addEventListener('mouseleave',()=>document.body.classList.remove('cursor-hover'));
+});
+
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+const rf=document.getElementById('reg-form');
+if(rf)rf.onsubmit=async e=>{
+  e.preventDefault();
+  const handle=document.getElementById('r-handle').value.trim();
+  const wallet=document.getElementById('r-wallet').value.trim();
+  const msg=document.getElementById('reg-msg');
+  const btn=document.getElementById('reg-btn');
+  btn.disabled=true;btn.textContent='REGISTERING...';
+  try{
+    const fd=new FormData();fd.append('x_handle',handle);fd.append('wallet',wallet);
+    const r=await fetch('/register',{method:'POST',body:fd});
+    const d=await r.json();
+    msg.className='wl-msg '+(d.ok?'success':'error');
+    msg.textContent=d.msg;
+    if(d.ok){
+      const safe=esc(handle.replace('@',''));
+      document.getElementById('wl-card').innerHTML=`
+        <div class="wl-ok">
+          <div class="wl-ok-check">✓</div>
+          <h3>YOU'RE IN</h3>
+          <p>@${safe} - whitelist confirmed</p>
+          <a href="https://x.com/intent/tweet?text=Just%20secured%20my%20spot%20on%20%40melonseasoned%20whitelist%20%F0%9F%8D%89%0A%0AFree%20mint.%20999%20supply." target="_blank" class="tweet-btn">TWEET TO CONFIRM →</a>
+        </div>`;
+    } else {
+      btn.disabled=false;btn.textContent='REGISTER FOR WHITELIST';
+    }
+  }catch{
+    msg.className='wl-msg error';msg.textContent='Network error';
+    btn.disabled=false;btn.textContent='REGISTER FOR WHITELIST';
+  }
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+whitelist.db
+__pycache__/
+*.pyc
+.env
+*.db-journal

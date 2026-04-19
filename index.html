@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Melon Season - AI Agent Ecosystem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;700&family=DM+Mono:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --ink:     #060606;
+  --ink2:    #0e0e0e;
+  --ink3:    #161616;
+  --paper:   #EEE9DF;
+  --paper2:  #E5DFD3;
+  --white:   #F8F6F2;
+  --acid:    #C8FF3A;
+  --acid2:   rgba(200,255,58,0.08);
+  --acid3:   rgba(200,255,58,0.25);
+  --rust:    #D4400A;
+  --muted:   rgba(248,246,242,0.38);
+  --muted2:  rgba(248,246,242,0.55);
+  --line:    rgba(255,255,255,0.06);
+  --line2:   rgba(6,6,6,0.10);
+  --ff-disp: 'Bebas Neue', sans-serif;
+  --ff-body: 'Space Grotesk', sans-serif;
+  --ff-mono: 'DM Mono', monospace;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);color:var(--white);
+  font-family:var(--ff-body);font-size:16px;line-height:1.6;
+  overflow-x:hidden;cursor:none;
+}
+a{color:inherit;text-decoration:none}
+ul{list-style:none}
+img{display:block}
+
+#cursor{
+  position:fixed;width:6px;height:6px;
+  background:var(--acid);border-radius:50%;
+  pointer-events:none;z-index:99999;
+  transform:translate(-50%,-50%);
+  mix-blend-mode:difference;
+  transition:width .2s,height .2s;
+}
+#cursor-ring{
+  position:fixed;width:36px;height:36px;
+  border:1px solid rgba(200,255,58,0.4);
+  border-radius:50%;pointer-events:none;z-index:99998;
+  transform:translate(-50%,-50%);
+  transition:width .5s,height .5s,opacity .3s;
+}
+body.cursor-hover #cursor{width:12px;height:12px}
+body.cursor-hover #cursor-ring{width:52px;height:52px;opacity:.3}
+
+#grain{
+  position:fixed;inset:0;pointer-events:none;z-index:9000;
+  opacity:.04;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+  animation:grain-anim .3s steps(1) infinite;
+}
+@keyframes grain-anim{
+  0%{transform:translate(0,0)}25%{transform:translate(-1%,-2%)}
+  50%{transform:translate(2%,1%)}75%{transform:translate(-2%,2%)}
+}
+
+
+
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:5000;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:28px 60px;
+  mix-blend-mode:difference;
+}
+.nav-wordmark{
+  font-family:var(--ff-disp);font-size:20px;letter-spacing:2px;
+  color:var(--white);
+}
+.nav-wordmark span{color:var(--acid)}
+.nav-items{display:flex;gap:40px;align-items:center}
+.nav-items a{
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  font-weight:500;opacity:.5;transition:opacity .2s;
+}
+.nav-items a:hover{opacity:1}
+.nav-cta{
+  background:var(--acid)!important;color:var(--ink)!important;
+  padding:9px 24px!important;font-weight:700!important;
+  opacity:1!important;
+  font-family:var(--ff-disp)!important;font-size:14px!important;
+  letter-spacing:1px!important;
+  transition:transform .3s,box-shadow .3s!important;
+}
+.nav-cta:hover{transform:scale(1.05);box-shadow:0 0 32px rgba(200,255,58,.3)}
+
+section{position:relative;z-index:10}
+.label{
+  font-family:var(--ff-mono);font-size:11px;
+  letter-spacing:.16em;text-transform:uppercase;
+  color:var(--acid);opacity:.7;
+}
+
+.s-hero{
+  height:100vh;min-height:700px;
+  display:flex;flex-direction:column;
+  justify-content:space-between;
+  padding:140px 60px 60px;
+  position:relative;overflow:hidden;
+}
+.hero-geo{
+  position:absolute;
+  right:-20px;top:50%;
+  transform:translateY(-50%);
+  width:min(52vw,580px);height:min(52vw,580px);
+  opacity:.13;pointer-events:none;z-index:0;
+  animation:geo-spin 80s linear infinite;
+}
+@keyframes geo-spin{to{transform:translateY(-50%) rotate(360deg)}}
+
+.hero-content{
+  position:relative;z-index:2;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  align-items:end;
+  flex:1;
+  margin-top:auto;
+}
+.hero-left{display:flex;flex-direction:column;justify-content:flex-end}
+.hero-badge{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:28px;
+}
+.hero-badge::before{
+  content:'';display:block;width:32px;height:1px;background:var(--acid);
+}
+.hero-badge span{
+  font-family:var(--ff-mono);font-size:11px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--acid);
+}
+.hero-h1{
+  font-family:var(--ff-disp);
+  font-size:clamp(88px,11vw,172px);
+  line-height:.84;letter-spacing:2px;
+}
+.h1-line1{
+  display:block;
+  clip-path:inset(0 100% 0 0);
+  animation:reveal-text .9s cubic-bezier(.16,1,.3,1) .2s forwards;
+}
+.h1-line2{
+  display:block;color:var(--acid);
+  margin-left:20px;
+  clip-path:inset(0 100% 0 0);
+  animation:reveal-text .9s cubic-bezier(.16,1,.3,1) .38s forwards;
+}
+.h1-line3{
+  display:block;
+  -webkit-text-stroke:1.5px rgba(248,246,242,.35);
+  color:transparent;
+  clip-path:inset(0 100% 0 0);
+  animation:reveal-text .9s cubic-bezier(.16,1,.3,1) .54s forwards;
+}
+@keyframes reveal-text{to{clip-path:inset(0 0% 0 0)}}
+
+.hero-right{
+  display:flex;flex-direction:column;
+  align-items:flex-end;justify-content:flex-end;
+  gap:36px;padding-left:40px;
+}
+.hero-desc{
+  max-width:280px;text-align:right;
+  font-size:14px;color:var(--muted2);line-height:1.85;
+}
+.hero-desc strong{color:var(--white);font-weight:500;display:block;margin-bottom:8px;font-size:15px}
+.hero-actions{display:flex;gap:12px;align-items:center}
+
+.btn-primary{
+  background:var(--acid);color:var(--ink);
+  padding:14px 36px;
+  font-family:var(--ff-disp);font-size:16px;letter-spacing:1px;
+  border:none;cursor:pointer;
+  transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s;
+  display:inline-block;
+}
+.btn-primary:hover{
+  transform:translateY(-3px) scale(1.03);
+  box-shadow:0 20px 60px rgba(200,255,58,.25);
+}
+.btn-ghost{
+  border:1px solid rgba(248,246,242,.15);
+  color:var(--white);background:transparent;
+  padding:14px 36px;
+  font-family:var(--ff-disp);font-size:16px;letter-spacing:1px;
+  cursor:pointer;transition:border-color .3s,background .3s;
+  display:inline-block;
+}
+.btn-ghost:hover{border-color:var(--acid);background:var(--acid2)}
+
+.hero-stats{
+  position:relative;z-index:2;
+  display:flex;gap:0;
+  border-top:1px solid var(--line);
+  margin-top:48px;
+}
+.stat{
+  flex:1;padding:20px 0;
+  border-right:1px solid var(--line);
+  opacity:0;animation:stat-in .5s cubic-bezier(.16,1,.3,1) forwards;
+}
+.stat:last-child{border-right:none}
+.stat:nth-child(1){animation-delay:.7s}
+.stat:nth-child(2){animation-delay:.85s}
+.stat:nth-child(3){animation-delay:1s}
+@keyframes stat-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.stat-val{
+  font-family:var(--ff-disp);font-size:28px;letter-spacing:1px;
+  color:var(--white);display:block;line-height:1;
+}
+.stat-lbl{
+  font-family:var(--ff-mono);font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin-top:5px;display:block;
+}
+
+.scroll-indicator{
+  position:absolute;bottom:28px;right:60px;z-index:2;
+  display:flex;align-items:center;gap:12px;opacity:.35;
+}
+.scroll-indicator span{
+  font-family:var(--ff-mono);font-size:9px;
+  letter-spacing:.2em;text-transform:uppercase;
+}
+.scroll-bar{
+  width:40px;height:1px;
+  background:linear-gradient(to right,var(--acid),transparent);
+  animation:scroll-pulse 2s ease-in-out infinite;
+}
+@keyframes scroll-pulse{0%,100%{opacity:.4;transform:scaleX(1)}50%{opacity:1;transform:scaleX(1.3)}}
+
+.s-break{
+  background:var(--paper);color:var(--ink);
+  padding:120px 60px;overflow:hidden;
+  position:relative;
+}
+.break-geo{
+  position:absolute;right:-60px;top:50%;
+  transform:translateY(-50%);
+  opacity:.06;pointer-events:none;
+}
+.break-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:0;
+}
+.break-left{
+  border-right:1px solid var(--line2);padding-right:80px;
+}
+.break-h{
+  font-family:var(--ff-disp);
+  font-size:clamp(56px,7vw,110px);
+  line-height:.84;letter-spacing:1px;margin-bottom:40px;
+}
+.break-h em{font-style:normal;color:var(--rust)}
+.break-right{
+  padding-left:80px;display:flex;flex-direction:column;justify-content:flex-end;
+}
+.break-sub{
+  font-size:18px;line-height:1.75;
+  color:rgba(6,6,6,.6);max-width:400px;margin-bottom:48px;
+}
+.break-sub strong{color:var(--ink)}
+.loop-line{
+  display:flex;align-items:center;gap:16px;
+  padding:20px 0;border-top:1px solid var(--line2);
+}
+.loop-line:last-child{border-bottom:1px solid var(--line2)}
+.loop-n{
+  font-family:var(--ff-disp);font-size:13px;letter-spacing:1px;
+  color:var(--rust);min-width:32px;
+}
+.loop-word{
+  font-size:14px;font-weight:700;letter-spacing:.04em;
+  text-transform:uppercase;flex:1;
+}
+.loop-arrow{font-size:16px;opacity:.3}
+
+.s-product{
+  background:var(--ink2);padding:140px 60px;
+  border-top:1px solid var(--line);overflow:hidden;
+}
+.prod-head{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:0;margin-bottom:100px;
+  border-bottom:1px solid var(--line);padding-bottom:80px;
+}
+.prod-h{
+  font-family:var(--ff-disp);
+  font-size:clamp(56px,7vw,110px);
+  line-height:.84;letter-spacing:1px;
+}
+.prod-h em{font-style:normal;color:var(--acid)}
+.prod-sub{
+  display:flex;flex-direction:column;justify-content:flex-end;padding-left:60px;
+}
+.prod-sub p{
+  font-size:16px;color:var(--muted2);line-height:1.8;max-width:360px;margin-bottom:32px;
+}
+.skills-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);
+}
+.sk{
+  background:var(--ink2);padding:52px 44px 48px;
+  position:relative;overflow:hidden;transition:background .3s;cursor:pointer;
+}
+.sk::before{
+  content:'';position:absolute;top:0;left:0;width:2px;height:0;
+  background:var(--acid);transition:height .4s cubic-bezier(.16,1,.3,1);
+}
+.sk:hover::before{height:100%}
+.sk:hover{background:rgba(200,255,58,.025)}
+.sk-num{
+  font-family:var(--ff-mono);font-size:10px;letter-spacing:.14em;
+  color:var(--muted);margin-bottom:36px;display:block;
+}
+.sk-icon{font-size:22px;margin-bottom:20px;opacity:.7}
+.sk-name{
+  font-family:var(--ff-disp);font-size:28px;letter-spacing:.5px;margin-bottom:12px;
+}
+.sk-desc{font-size:14px;color:var(--muted2);line-height:1.65}
+.sk-tag{
+  display:inline-block;margin-top:24px;
+  font-family:var(--ff-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--acid);border:1px solid rgba(200,255,58,.25);padding:3px 12px;
+}
+
+.s-evo{
+  background:var(--ink);padding:140px 60px;position:relative;overflow:hidden;
+}
+.evo-bg-text{
+  position:absolute;bottom:-20px;left:-10px;
+  font-family:var(--ff-disp);font-size:clamp(180px,22vw,340px);
+  letter-spacing:-8px;line-height:1;color:rgba(248,246,242,.024);
+  pointer-events:none;white-space:nowrap;
+  animation:bg-drift 20s ease-in-out infinite;
+}
+@keyframes bg-drift{0%,100%{transform:translateX(0)}50%{transform:translateX(-60px)}}
+.evo-header{display:grid;grid-template-columns:1fr 1fr;margin-bottom:80px}
+.evo-h{
+  font-family:var(--ff-disp);font-size:clamp(56px,7vw,110px);
+  line-height:.84;letter-spacing:1px;
+}
+.evo-h em{font-style:normal;color:var(--acid)}
+.evo-note{
+  display:flex;flex-direction:column;justify-content:flex-end;padding-left:60px;
+}
+.evo-note p{font-size:15px;color:var(--muted2);line-height:1.8;max-width:340px;margin-bottom:24px}
+.evo-note small{font-family:var(--ff-mono);font-size:11px;letter-spacing:.1em;color:var(--acid);opacity:.6}
+.stages{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line)}
+.stage{
+  background:var(--ink);padding:56px 36px 52px;position:relative;overflow:hidden;transition:background .3s;
+}
+.stage:hover{background:rgba(248,246,242,.015)}
+.stage-num{
+  position:absolute;top:24px;right:24px;
+  font-family:var(--ff-disp);font-size:80px;color:rgba(248,246,242,.03);
+  letter-spacing:-3px;line-height:1;
+}
+.stage-icon{font-size:28px;margin-bottom:28px;opacity:.6}
+.stage-name{font-family:var(--ff-disp);font-size:32px;letter-spacing:1px;margin-bottom:6px}
+.stage-req{
+  font-family:var(--ff-mono);font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:28px;
+}
+.stage-perks{display:flex;flex-direction:column;gap:12px}
+.stage-perks li{
+  font-size:13px;color:var(--muted2);display:flex;align-items:flex-start;gap:10px;line-height:1.4;
+}
+.stage-perks li::before{content:'-';color:var(--acid);font-size:11px;margin-top:1px;flex-shrink:0}
+.stage-prime{
+  background:rgba(200,255,58,.03)!important;border:1px solid rgba(200,255,58,.15);
+}
+.stage-prime .stage-name{color:var(--acid)}
+.stage-prime .stage-req{color:rgba(200,255,58,.5)}
+
+.s-lore{
+  background:var(--paper);color:var(--ink);padding:140px 60px;overflow:hidden;position:relative;
+}
+.lore-wm{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:var(--ff-disp);font-size:clamp(160px,20vw,300px);
+  letter-spacing:-10px;line-height:1;color:rgba(6,6,6,.04);
+  white-space:nowrap;pointer-events:none;
+  animation:lore-wm-drift 25s ease-in-out infinite;
+}
+@keyframes lore-wm-drift{0%,100%{letter-spacing:-10px;transform:translate(-50%,-50%)}50%{letter-spacing:-4px;transform:translate(-50%,-52%)}}
+.lore-inner{position:relative;z-index:2}
+.lore-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.lore-left{padding-right:80px;border-right:1px solid var(--line2)}
+.lore-quote{
+  font-family:var(--ff-disp);font-size:clamp(40px,5vw,72px);
+  line-height:.9;letter-spacing:1px;margin-bottom:48px;
+}
+.lore-quote em{font-style:normal;color:var(--rust)}
+.lore-body{font-size:17px;line-height:1.85;color:rgba(6,6,6,.58);max-width:480px;margin-bottom:48px}
+.lore-tags{display:flex;flex-wrap:wrap;gap:8px}
+.ltag{
+  border:1px solid var(--line2);color:rgba(6,6,6,.5);padding:7px 20px;
+  font-family:var(--ff-mono);font-size:11px;letter-spacing:.06em;
+  transition:border-color .3s,color .3s;cursor:default;
+}
+.ltag:hover{border-color:var(--rust);color:var(--rust)}
+.lore-right{padding-left:80px;display:flex;flex-direction:column;justify-content:center;gap:48px}
+.lore-concept{border-top:1px solid var(--line2);padding-top:32px}
+.concept-title{font-family:var(--ff-disp);font-size:22px;letter-spacing:.5px;margin-bottom:8px}
+.concept-body{font-size:14px;color:rgba(6,6,6,.5);line-height:1.7}
+
+.s-nft{
+  background:var(--ink2);padding:140px 60px;border-top:1px solid var(--line);
+}
+.nft-intro{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-bottom:80px}
+.nft-h{
+  font-family:var(--ff-disp);font-size:clamp(56px,7vw,110px);
+  line-height:.84;letter-spacing:1px;
+}
+.nft-h em{font-style:normal;color:var(--acid)}
+.nft-claim{display:flex;flex-direction:column;justify-content:flex-end;padding-left:60px}
+.nft-claim p{font-size:16px;color:var(--muted2);line-height:1.8;max-width:360px}
+.nft-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line)}
+.nft-card{background:var(--ink2);padding:60px 52px;position:relative}
+.nft-card-n{
+  font-family:var(--ff-mono);font-size:10px;letter-spacing:.14em;
+  color:var(--muted);margin-bottom:28px;display:block;
+}
+.nft-card-title{font-family:var(--ff-disp);font-size:30px;letter-spacing:.5px;margin-bottom:14px}
+.nft-card-body{font-size:15px;color:var(--muted2);line-height:1.75}
+.nft-card-accent{border-left:2px solid var(--acid);padding-left:28px}
+.nft-card-accent .nft-card-title{color:var(--acid)}
+
+.s-cta{
+  background:var(--ink);padding:180px 60px;text-align:center;overflow:hidden;position:relative;
+}
+.cta-circle{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:700px;height:700px;border-radius:50%;
+  border:1px solid rgba(200,255,58,.06);pointer-events:none;
+}
+.cta-circle:nth-child(2){width:500px;height:500px;border-color:rgba(200,255,58,.1)}
+.cta-circle:nth-child(3){width:300px;height:300px;border-color:rgba(200,255,58,.15)}
+.cta-glow{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(200,255,58,.055),transparent 70%);pointer-events:none;
+}
+.cta-eyebrow{
+  font-family:var(--ff-mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--acid);margin-bottom:32px;opacity:.7;
+}
+.cta-h{
+  font-family:var(--ff-disp);font-size:clamp(80px,14vw,220px);
+  line-height:.8;letter-spacing:2px;margin-bottom:48px;position:relative;z-index:2;
+}
+.cta-h .l1{display:block;transform:translateX(-24px)}
+.cta-h .l2{display:block;color:var(--acid);transform:translateX(40px)}
+.cta-h .l3{display:block;transform:translateX(-16px)}
+.cta-meta{font-size:14px;color:var(--muted);margin-bottom:48px;letter-spacing:.04em;position:relative;z-index:2}
+.cta-meta strong{color:var(--white)}
+.cta-btns{display:flex;justify-content:center;gap:16px;position:relative;z-index:2}
+
+footer{
+  background:var(--ink);border-top:1px solid var(--line);padding:40px 60px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.f-mark{font-family:var(--ff-disp);font-size:18px;letter-spacing:2px;color:var(--white)}
+.f-mark span{color:var(--acid)}
+.f-nav{display:flex;gap:28px}
+.f-nav a{font-size:12px;color:var(--muted);transition:color .2s;letter-spacing:.06em}
+.f-nav a:hover{color:var(--white)}
+.f-copy{font-family:var(--ff-mono);font-size:11px;color:var(--muted)}
+
+.sr{opacity:0;transform:translateY(40px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
+.sr.in{opacity:1;transform:none}
+.sr-delay-1{transition-delay:.1s}.sr-delay-2{transition-delay:.2s}
+.sr-delay-3{transition-delay:.3s}.sr-delay-4{transition-delay:.4s}
+
+@media(max-width:900px){
+  nav{padding:20px 24px}
+  .nav-items{display:none}
+  .s-hero{padding:120px 24px 40px}
+  .hero-content{grid-template-columns:1fr}
+  .hero-right{display:none}
+  .hero-geo{width:60vw;height:60vw;right:-10px;opacity:.08}
+  .s-break,.s-product,.s-evo,.s-lore,.s-nft,.s-cta{padding:80px 24px}
+  .break-grid,.prod-head,.evo-header,.lore-grid,.nft-intro{grid-template-columns:1fr}
+  .break-left{border-right:none;border-bottom:1px solid var(--line2);padding:0 0 40px;margin-bottom:40px}
+  .break-right,.prod-sub,.evo-note,.lore-right,.nft-claim{padding-left:0;margin-top:40px}
+  .lore-left{border-right:none;border-bottom:1px solid var(--line2);padding:0 0 40px;margin-bottom:40px}
+  .skills-grid{grid-template-columns:1fr}
+  .stages{grid-template-columns:1fr 1fr}
+  .nft-grid{grid-template-columns:1fr}
+  footer{flex-direction:column;gap:20px;text-align:center}
+  .scroll-indicator{display:none}
+}
+</style>
+</head>
+<body>
+
+<div id="grain"></div>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<nav>
+  <a href="#" class="nav-wordmark">MELON<span>.</span></a>
+  <ul class="nav-items">
+    <li><a href="#system">System</a></li>
+    <li><a href="#product">Platform</a></li>
+    <li><a href="#evolution">Evolution</a></li>
+    <li><a href="#lore">Lore</a></li>
+    <li><a href="/whitelist" class="nav-cta">WHITELIST</a></li>
+  </ul>
+</nav>
+
+<section class="s-hero" id="hero">
+  <svg class="hero-geo" viewBox="0 0 580 580" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="290" cy="290" r="260" stroke="white" stroke-width="1"/>
+    <circle cx="290" cy="290" r="170" stroke="white" stroke-width="0.5"/>
+    <ellipse cx="290" cy="290" rx="260" ry="100" stroke="white" stroke-width="0.7"/>
+    <ellipse cx="290" cy="290" rx="260" ry="100" stroke="white" stroke-width="0.7" transform="rotate(60 290 290)"/>
+    <ellipse cx="290" cy="290" rx="260" ry="100" stroke="white" stroke-width="0.7" transform="rotate(120 290 290)"/>
+    <circle cx="290" cy="290" r="6" fill="white" opacity="0.4"/>
+  </svg>
+
+  <div class="hero-content">
+    <div class="hero-left">
+      
+      <h1 class="hero-h1">
+        <span class="h1-line1">MELON</span>
+        <span class="h1-line2">SEASON</span>
+        <span class="h1-line3">IS NOW</span>
+      </h1>
+    </div>
+    <div class="hero-right">
+      <p class="hero-desc">
+        <strong>Build AI agents. Stake your NFT. Earn through usage.</strong>
+        A gamified system where your participation shapes what you become.
+      </p>
+      <div class="hero-actions">
+        <a href="/whitelist" class="btn-primary">WHITELIST</a>
+        <a href="#system" class="btn-ghost">EXPLORE</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat"><span class="stat-val">999</span><span class="stat-lbl">Supply</span></div>
+    <div class="stat"><span class="stat-val">Free</span><span class="stat-lbl">Mint Price</span></div>
+    <div class="stat"><span class="stat-val">ETH</span><span class="stat-lbl">Chain</span></div>
+  </div>
+  <div class="scroll-indicator"><div class="scroll-bar"></div><span>Scroll</span></div>
+</section>
+
+
+<section class="s-break" id="system">
+  <svg class="break-geo" width="500" height="500" viewBox="0 0 500 500" fill="none">
+    <circle cx="250" cy="250" r="220" stroke="#060606" stroke-width="0.8"/>
+    <ellipse cx="250" cy="250" rx="220" ry="90" stroke="#060606" stroke-width="0.5"/>
+    <ellipse cx="250" cy="250" rx="220" ry="90" stroke="#060606" stroke-width="0.5" transform="rotate(90 250 250)"/>
+    <circle cx="250" cy="250" r="6" fill="#D4400A"/>
+  </svg>
+  <div class="break-grid">
+    <div class="break-left">
+      <span class="label" style="color:var(--rust);margin-bottom:24px;display:block">How It Works</span>
+      <h2 class="break-h sr">THE<br>LOOP<br><em>RUNS</em><br>DEEP</h2>
+    </div>
+    <div class="break-right">
+      <p class="break-sub sr">Every action feeds back into itself. <strong>Use the platform, earn points, evolve your NFT, gain influence.</strong> The more you participate, the more powerful your identity becomes.</p>
+      <div>
+        <div class="loop-line sr sr-delay-1"><span class="loop-n">01</span><span class="loop-word">Mint</span><span class="loop-arrow">→</span></div>
+        <div class="loop-line sr sr-delay-2"><span class="loop-n">02</span><span class="loop-word">Stake</span><span class="loop-arrow">→</span></div>
+        <div class="loop-line sr sr-delay-3"><span class="loop-n">03</span><span class="loop-word">Use &amp; Earn</span><span class="loop-arrow">→</span></div>
+        <div class="loop-line sr sr-delay-4"><span class="loop-n">04</span><span class="loop-word">Level Up</span><span class="loop-arrow">→</span></div>
+        <div class="loop-line sr"><span class="loop-n">05</span><span class="loop-word">Evolve</span><span class="loop-arrow">∞</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="s-product" id="product">
+  <div class="prod-head">
+    <div>
+      <span class="label" style="display:block;margin-bottom:24px">The Platform</span>
+      <h2 class="prod-h sr">ONE<br>AGENT.<br><em>EVERY</em><br>PLATFORM.</h2>
+    </div>
+    <div class="prod-sub">
+      <p class="sr">Unified AI agents running Discord and Telegram from a single dashboard. Describe your project, pick skills, go live in minutes. No code.</p>
+      <a href="/whitelist" class="btn-primary sr" style="width:fit-content">Get Early Access</a>
+    </div>
+  </div>
+  <div class="skills-grid">
+    <div class="sk sr"><span class="sk-num">SK - 01</span><div class="sk-icon">⬡</div><div class="sk-name">Agent Builder</div><p class="sk-desc">Describe your project. Link docs. Get a working AI agent deployed across Discord and Telegram instantly - no code required.</p><span class="sk-tag">Core</span></div>
+    <div class="sk sr sr-delay-1"><span class="sk-num">SK - 02</span><div class="sk-icon">-</div><div class="sk-name">Giveaway Engine</div><p class="sk-desc">Automated raffles and reward drops. Set rules, randomise winners, distribute - all from one command.</p><span class="sk-tag">Engagement</span></div>
+    <div class="sk sr sr-delay-2"><span class="sk-num">SK - 03</span><div class="sk-icon">⬟</div><div class="sk-name">Community Shield</div><p class="sk-desc">Intelligent moderation, onboarding flows, and auto-responses. Your community protected 24/7.</p><span class="sk-tag">Moderation</span></div>
+    <div class="sk sr sr-delay-3"><span class="sk-num">SK - 04</span><div class="sk-icon">-</div><div class="sk-name">Research Assistant</div><p class="sk-desc">Pull real-time data, summarise threads, generate reports. Knowledge at the speed of your community.</p><span class="sk-tag">Research</span></div>
+    <div class="sk sr sr-delay-4"><span class="sk-num">SK - 05</span><div class="sk-icon">⬡</div><div class="sk-name">Engagement Games</div><p class="sk-desc">Quizzes, duels, trivia, leaderboards, and XP systems. Turn passive members into daily participants.</p><span class="sk-tag">Games</span></div>
+    <div class="sk sr"><span class="sk-num">SK - 06</span><div class="sk-icon">-</div><div class="sk-name">Content Engine</div><p class="sk-desc">Generate tweets, announcements, and updates in your project voice. Always on brand.</p><span class="sk-tag">Content</span></div>
+  </div>
+</section>
+
+<section class="s-evo" id="evolution">
+  <div class="evo-bg-text" aria-hidden="true">EVOLVE</div>
+  <div class="evo-header">
+    <div>
+      <span class="label" style="display:block;margin-bottom:24px">NFT Evolution</span>
+      <h2 class="evo-h sr">YOUR NFT<br>EVOLVES<br>WITH <em>YOU.</em></h2>
+    </div>
+    <div class="evo-note">
+      <p class="sr">Not random. Not bought. Your NFT's traits are determined entirely by your participation - usage, points, and engagement define what you become.</p>
+      <small class="sr">Identity earned, never purchased.</small>
+    </div>
+  </div>
+  <div class="stages">
+    <div class="stage sr"><div class="stage-num">01</div><div class="stage-icon">-</div><div class="stage-name">SEED</div><div class="stage-req">Mint only</div><ul class="stage-perks"><li>Platform access</li><li>1 active agent</li><li>Basic skills</li><li>Community entry</li></ul></div>
+    <div class="stage sr sr-delay-1"><div class="stage-num">02</div><div class="stage-icon">-</div><div class="stage-name">GROWING</div><div class="stage-req">Basic activity</div><ul class="stage-perks"><li>3 active agents</li><li>Expanded skills</li><li>Leaderboard access</li><li>Weekly rewards</li></ul></div>
+    <div class="stage sr sr-delay-2"><div class="stage-num">03</div><div class="stage-icon">-</div><div class="stage-name">RIPE</div><div class="stage-req">Consistent usage</div><ul class="stage-perks"><li>Unlimited agents</li><li>Premium skills</li><li>Revenue pool access</li><li>Early feature access</li></ul></div>
+    <div class="stage stage-prime sr sr-delay-3"><div class="stage-num">04</div><div class="stage-icon">-</div><div class="stage-name">PRIME</div><div class="stage-req">Top % holders</div><ul class="stage-perks"><li>Governance votes</li><li>IP co-creation</li><li>Max revenue share</li><li>Season influence</li></ul></div>
+  </div>
+</section>
+
+<section class="s-lore" id="lore">
+  <div class="lore-wm" aria-hidden="true">SEASON</div>
+  <div class="lore-inner">
+    <span class="label" style="color:var(--rust);display:block;margin-bottom:48px">The World</span>
+    <div class="lore-grid">
+      <div class="lore-left">
+        <h2 class="lore-quote sr">Once every cycle,<br><em>Melon Season</em><br>begins.</h2>
+        <p class="lore-body sr">New Melons appear - unformed, unknown. Seeds.<br>Only those who participate, evolve, and compete<br>shape what they become.<br><br>The Season does not care who you were.<br>Only what you do.</p>
+        <div class="lore-tags sr">
+          <span class="ltag">999 Seeds</span><span class="ltag">Season 01</span><span class="ltag">Reveal Month 2</span><span class="ltag">Identity Earned</span><span class="ltag">Ethereum</span>
+        </div>
+      </div>
+      <div class="lore-right">
+        <div class="lore-concept sr"><div class="concept-title">Seeds</div><p class="concept-body">Every NFT starts unrevealed. Your participation during Season 01 determines what emerges at reveal.</p></div>
+        <div class="lore-concept sr sr-delay-1"><div class="concept-title">Growth</div><p class="concept-body">Active participation accumulates points. Points shape traits. Traits define status. Status is permanent on-chain.</p></div>
+        <div class="lore-concept sr sr-delay-2"><div class="concept-title">Season</div><p class="concept-body">Each cycle introduces new mechanics, new reveals, new opportunities. Early seasons carry the deepest lore.</p></div>
+        <div class="lore-concept sr sr-delay-3"><div class="concept-title">Prime</div><p class="concept-body">The top percentage of active holders shape the future - skills, IP direction, Season 02.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="s-nft">
+  <div class="nft-intro">
+    <div><span class="label" style="display:block;margin-bottom:24px">NFT Utility</span><h2 class="nft-h sr">NOT A<br>PASS.<br>A <em>SYSTEM.</em></h2></div>
+    <div class="nft-claim"><p class="sr">The NFT is not the product. The agent platform is. Your NFT enhances access, reflects identity, and routes you into the ecosystem's reward mechanics.</p></div>
+  </div>
+  <div class="nft-grid">
+    <div class="nft-card sr"><span class="nft-card-n">UTIL - 01</span><h3 class="nft-card-title">Platform Access</h3><p class="nft-card-body">Stake your NFT to unlock the agent builder. Higher tiers unlock higher limits, more agents, and premium skills - no extra cost.</p></div>
+    <div class="nft-card nft-card-accent sr sr-delay-1"><span class="nft-card-n">UTIL - 02</span><h3 class="nft-card-title">Revenue Pool</h3><p class="nft-card-body">Platform revenue flows into an ecosystem pool. Ripe and Prime holders participate in distribution - earned by usage, not just holding.</p></div>
+    <div class="nft-card sr sr-delay-2"><span class="nft-card-n">UTIL - 03</span><h3 class="nft-card-title">Identity Layer</h3><p class="nft-card-body">Your NFT's traits reflect your participation. Every action shapes how your Melon looks when Season reveals in Month 2.</p></div>
+    <div class="nft-card sr sr-delay-3"><span class="nft-card-n">UTIL - 04</span><h3 class="nft-card-title">IP Co-Creation</h3><p class="nft-card-body">Prime holders vote on new skills, IP direction, and the expansion of the Melon universe. You don't just hold - you build.</p></div>
+  </div>
+</section>
+
+<section class="s-cta" id="mint">
+  <div class="cta-circle"></div><div class="cta-circle"></div><div class="cta-circle"></div>
+  <div class="cta-glow"></div>
+  <div class="cta-eyebrow">Season 01 - Free Mint - Ethereum</div>
+  <h2 class="cta-h sr"><span class="l1">ENTER</span><span class="l2">THE</span><span class="l3">SEASON</span></h2>
+  <p class="cta-meta sr"><strong>999</strong> Seeds available - <strong>Free</strong> to mint on Ethereum</p>
+  <div class="cta-btns sr">
+    <a href="/whitelist" class="btn-primary">JOIN WHITELIST</a>
+    <a href="#" class="btn-ghost">JOIN DISCORD</a>
+  </div>
+</section>
+
+<footer>
+  <div class="f-mark">MELON<span>.</span></div>
+  <ul class="f-nav">
+    <li><a href="https://x.com/melonseasoned" target="_blank">Twitter / X</a></li>
+    <li><a href="#">Discord</a></li>
+    <li><a href="#">Telegram</a></li>
+  </ul>
+  <div class="f-copy">© 2026 Melon Season</div>
+</footer>
+
+<script>
+/* CURSOR */
+const cursor=document.getElementById('cursor');
+const cring=document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px'});
+(function ac(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;cring.style.left=rx+'px';cring.style.top=ry+'px';requestAnimationFrame(ac)})();
+document.querySelectorAll('a,button,.sk,.stage,.nft-card,.loop-line,.ltag,.wl-input,.wl-btn').forEach(el=>{
+  el.addEventListener('mouseenter',()=>document.body.classList.add('cursor-hover'));
+  el.addEventListener('mouseleave',()=>document.body.classList.remove('cursor-hover'));
+});
+
+/* SCROLL REVEAL */
+const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in')})},{threshold:.15});
+document.querySelectorAll('.sr').forEach(el=>io.observe(el));
+
+/* PARALLAX */
+window.addEventListener('scroll',()=>{
+  const sy=window.scrollY;
+  const bg=document.querySelector('.break-geo');if(bg)bg.style.transform=`translateY(calc(-50% + ${sy*.08}px))`;
+  const lw=document.querySelector('.lore-wm');if(lw)lw.style.transform=`translate(-50%,calc(-50% + ${sy*.05}px)) scaleX(${1+sy*.0002})`;
+  const eb=document.querySelector('.evo-bg-text');if(eb)eb.style.transform=`translateX(${-sy*.12}px)`;
+});
+</script>
+</body>
+</html>
+
