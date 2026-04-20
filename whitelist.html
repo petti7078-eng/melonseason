@@ -173,7 +173,7 @@ nav{
 
     <div class="wl-progress">
       <div class="wl-bar"><div class="wl-bar-fill" style="width:{{ (wl_count/150*100)|round(1) }}%"></div></div>
-      <div class="wl-bar-txt"><strong>{{ wl_count }}</strong> / 150 claimed</div>
+      <div class="wl-bar-txt"><strong>{{ 150 - wl_count }}</strong> / 150 spots remaining</div>
     </div>
 
     <div class="wl-card" id="wl-card">
@@ -190,8 +190,20 @@ nav{
         <input type="text" class="wl-input" id="r-handle" placeholder="@yourhandle" required minlength="2" maxlength="30">
         <label class="wl-label">Wallet Address</label>
         <input type="text" class="wl-input" id="r-wallet" placeholder="0x..." required maxlength="42">
+
+        <div style="margin-bottom:20px">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:rgba(248,246,242,0.55)">
+            <input type="checkbox" id="r-follow" required style="accent-color:#C8FF3A;width:16px;height:16px;cursor:pointer">
+            I follow <a href="https://x.com/melonseasoned" target="_blank" style="color:#C8FF3A;text-decoration:underline">@melonseasoned</a> on X
+          </label>
+        </div>
+
         <button type="submit" class="wl-btn" id="reg-btn">REGISTER FOR WHITELIST</button>
         <div class="wl-msg" id="reg-msg"></div>
+
+        <p style="margin-top:16px;font-family:var(--ff-mono);font-size:10px;letter-spacing:.08em;color:rgba(248,246,242,0.25);text-align:center;line-height:1.7">
+          All entries will be verified before final allocation.
+        </p>
       </form>
       {% endif %}
     </div>
