@@ -182,7 +182,7 @@ nav{
         <div class="wl-ok-check">✓</div>
         <h3>YOU'RE IN</h3>
         <p>@{{ x_handle }} - whitelist confirmed</p>
-        <a href="https://x.com/intent/tweet?text=Just%20secured%20my%20spot%20on%20%40melonseasoned%20whitelist%20%F0%9F%8D%89%0A%0AFree%20mint.%20999%20supply." target="_blank" class="tweet-btn">TWEET TO CONFIRM →</a>
+        <a href="https://x.com/intent/tweet?text=Just%20secured%20my%20%40melonseasoned%20whitelist%20spot%20%F0%9F%8D%89%0A%0A999%20supply.%20Free%20mint.%20Your%20NFT%20evolves%20based%20on%20what%20you%20do.%0A%0A150%20WL%20spots%20-%20going%20fast%0A%0Amelonseasoned.xyz" target="_blank" class="tweet-btn">TWEET TO CONFIRM →</a>
       </div>
       {% else %}
       <form id="reg-form">
@@ -195,6 +195,13 @@ nav{
           <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:rgba(248,246,242,0.55)">
             <input type="checkbox" id="r-follow" required style="accent-color:#C8FF3A;width:16px;height:16px;cursor:pointer">
             I follow <a href="https://x.com/melonseasoned" target="_blank" style="color:#C8FF3A;text-decoration:underline">@melonseasoned</a> on X
+          </label>
+        </div>
+
+        <div style="margin-bottom:20px">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:rgba(248,246,242,0.55)">
+            <input type="checkbox" id="r-engage" required style="accent-color:#C8FF3A;width:16px;height:16px;cursor:pointer">
+            I liked & commented on <a href="https://x.com/melonseasoned/status/2046013549789556796" target="_blank" style="color:#C8FF3A;text-decoration:underline">this post</a>
           </label>
         </div>
 
@@ -249,7 +256,7 @@ if(rf)rf.onsubmit=async e=>{
           <div class="wl-ok-check">✓</div>
           <h3>YOU'RE IN</h3>
           <p>@${safe} - whitelist confirmed</p>
-          <a href="https://x.com/intent/tweet?text=Just%20secured%20my%20spot%20on%20%40melonseasoned%20whitelist%20%F0%9F%8D%89%0A%0AFree%20mint.%20999%20supply." target="_blank" class="tweet-btn">TWEET TO CONFIRM →</a>
+          <a href="https://x.com/intent/tweet?text=Just%20secured%20my%20%40melonseasoned%20whitelist%20spot%20%F0%9F%8D%89%0A%0A999%20supply.%20Free%20mint.%20Your%20NFT%20evolves%20based%20on%20what%20you%20do.%0A%0A150%20WL%20spots%20-%20going%20fast%0A%0Amelonseasoned.xyz" target="_blank" class="tweet-btn">TWEET TO CONFIRM →</a>
         </div>`;
     } else {
       btn.disabled=false;btn.textContent='REGISTER FOR WHITELIST';
